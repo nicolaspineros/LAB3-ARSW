@@ -3,6 +3,7 @@ package edu.eci.arsw.blacklistvalidator;
 import edu.eci.arsw.spamkeywordsdatasource.HostBlacklistsDataSourceFacade;
 
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BlackListThread extends Thread{
     private static final int BLACK_LIST_ALARM_COUNT=5;
@@ -10,7 +11,7 @@ public class BlackListThread extends Thread{
     private String host;
     HostBlacklistsDataSourceFacade skds=HostBlacklistsDataSourceFacade.getInstance();
     LinkedList<Integer> blackListOcurrences=new LinkedList<>();
-    private int checkedListsCount = 0;
+    private AtomicInteger checkedListsCount = new AtomicInteger(0);
     private int ocurrences = 0;
     private Object lock = new Object();
     public static boolean stop = false;
@@ -34,7 +35,7 @@ public class BlackListThread extends Thread{
                     }
                 }
             }
-            checkedListsCount++;
+            checkedListsCount.addAndGet(1);;
             if (skds.isInBlackListServer(i, host)) {
                 blackListOcurrences.add(i);
                 ocurrences++;
@@ -46,7 +47,7 @@ public class BlackListThread extends Thread{
         return blackListOcurrences;
     }
 
-    public int getCheckedListsCount() {
+    public AtomicInteger getCheckedListsCount() {
         return checkedListsCount;
     }
 
