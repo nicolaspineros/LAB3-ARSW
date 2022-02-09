@@ -38,7 +38,7 @@ public class Immortal extends Thread {
 
     public void run() {
 
-        while (true) {
+        while (!ControlFrame.exit) {
 
             if(waiting) {
                 try {
@@ -85,6 +85,7 @@ public class Immortal extends Thread {
                     updateCallback.processReport("Fight: " + this + " vs " + i2 + "\n");
                 } else{
                     updateCallback.processReport(this + " says:" + i2 + " is already dead!\n");
+                    this.immortalsPopulation.remove(i2);
                 }
             }
         }

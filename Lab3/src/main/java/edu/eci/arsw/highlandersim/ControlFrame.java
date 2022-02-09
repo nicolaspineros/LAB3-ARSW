@@ -38,6 +38,7 @@ public class ControlFrame extends JFrame {
     private JTextField numOfImmortals;
 
     private Object lock = new Object();
+    public static boolean exit = false;
 
     /**
      * Launch the application.
@@ -134,6 +135,12 @@ public class ControlFrame extends JFrame {
 
         JButton btnStop = new JButton("STOP");
         btnStop.setForeground(Color.RED);
+        btnStop.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                exit = true;
+            }
+        });
         toolBar.add(btnStop);
 
         scrollPane = new JScrollPane();
