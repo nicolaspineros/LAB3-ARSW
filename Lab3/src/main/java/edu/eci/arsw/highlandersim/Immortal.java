@@ -2,12 +2,13 @@ package edu.eci.arsw.highlandersim;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Immortal extends Thread {
 
     private ImmortalUpdateReportCallback updateCallback=null;
     
-    private int health;
+    private AtomicInteger health = new AtomicInteger(0);
     
     private int defaultDamageValue;
 
@@ -26,7 +27,8 @@ public class Immortal extends Thread {
         this.updateCallback=ucb;
         this.name = name;
         this.immortalsPopulation = immortalsPopulation;
-        this.health = health;
+        this.health.set(health);
+        System.out.println(health);
         this.defaultDamageValue=defaultDamageValue;
         this.lock=lock;
     }
@@ -64,7 +66,7 @@ public class Immortal extends Thread {
             this.fight(im);
 
             try {
-                Thread.sleep(1);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -75,22 +77,27 @@ public class Immortal extends Thread {
 
     public void fight(Immortal i2) {
 
-        if (i2.getHealth() > 0) {
-            i2.changeHealth(i2.getHealth() - defaultDamageValue);
-            this.health += defaultDamageValue;
-            updateCallback.processReport("Fight: " + this + " vs " + i2+"\n");
-        } else {
-            updateCallback.processReport(this + " says:" + i2 + " is already dead!\n");
+        synchronized (this) {
+            synchronized (lock) {
+                if (i2.getHealth() > 0) {
+                    i2.changeHealth(i2.getHealth() - defaultDamageValue);
+                    this.health.addAndGet(defaultDamageValue);
+                    updateCallback.processReport("Fight: " + this + " vs " + i2 + "\n");
+                } else{
+                    updateCallback.processReport(this + " says:" + i2 + " is already dead!\n");
+                }
+            }
         }
-
     }
 
     public void changeHealth(int v) {
-        health = v;
+        //System.out.println("change: "+v);
+        health.set(v);
     }
 
     public int getHealth() {
-        return health;
+        //System.out.println(health.get());
+        return health.get();
     }
 
     @Override

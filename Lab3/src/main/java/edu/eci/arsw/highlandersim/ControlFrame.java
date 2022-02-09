@@ -115,7 +115,7 @@ public class ControlFrame extends JFrame {
                  */
                 synchronized (lock){
                     for (Immortal im : immortals) {
-                    im.restart();
+                        im.restart();
                     }
                     lock.notifyAll();
                 }
